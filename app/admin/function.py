@@ -1,5 +1,5 @@
 #-*- coding=utf-8 -*-
-from base_view import *
+from .base_view import *
 
 
 
@@ -8,6 +8,8 @@ from base_view import *
 def login():
     if request.method=='POST':
         password1=request.form.get('password')
+        print(password1)
+        print(GetConfig('password'))
         if password1==GetConfig('password'):
             session['login']='true'
             if not os.path.exists(os.path.join(config_dir,'.install')):
@@ -15,6 +17,7 @@ def login():
                 return resp
             resp=MakeResponse(redirect(url_for('admin.setting')))
         else:
+            print('密码错误')
             resp=MakeResponse(render_template('admin/login.html'))
         return resp
     if session.get('login'):

@@ -1,27 +1,32 @@
 #-*- coding=utf-8 -*-
-from base_view import *
+from requests.api import request
+from .base_view import *
 
 ########admin
 @admin.route('/',methods=['GET','POST'])
 @admin.route('/setting',methods=['GET','POST'])
 def setting():
     if request.method=='POST':
-        if request.files.keys()!=[]:
+        if str(request.files)!='ImmutableMultiDict([])':
             favicon=request.files['favicon']
+            print(favicon.content_length)
             if favicon.content_length!=0:
                 favicon.save('./app/static/img/favicon.ico')
+        print(1)
         title=request.form.get('title','PyOne')
         theme=request.form.get('theme','material')
         title_pre=request.form.get('title_pre','index of ')
+        print(2)
 
         set_config('title',title)
         set_config('title_pre',title_pre)
         set_config('theme',theme)
-
+        print(3)
         # reload()
         redis_client.set('title',title)
         redis_client.set('title_pre',title_pre)
         redis_client.set('theme',theme)
+        print('更新成功')
         flash('更新成功')
         resp=MakeResponse(redirect(url_for('admin.setting')))
         return resp

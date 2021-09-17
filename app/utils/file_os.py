@@ -1,5 +1,5 @@
 #-*- coding=utf-8 -*-
-from header import *
+from .header import *
 
 ########################删除文件
 def DeleteLocalFile(fileid):

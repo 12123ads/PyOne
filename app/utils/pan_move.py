@@ -1,8 +1,8 @@
 #-*- coding=utf-8 -*-
-from header import *
-from upload import *
-from common import *
-from offdownload import *
+from .header import *
+from .upload import *
+from .common import *
+from .offdownload import *
 import shutil
 
 

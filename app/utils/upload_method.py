@@ -1,6 +1,6 @@
 #-*- coding=utf-8 -*-
-from header import *
-from upload import *
+from .header import *
+from .upload import *
 
 def CutText(msg,indent=15):
     if len(msg)>indent*2:

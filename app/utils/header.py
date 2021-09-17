@@ -16,21 +16,19 @@ import time
 import shutil
 import base64
 import humanize
-import StringIO
+import io as StringIO
 import subprocess
 import signal
 from dateutil.parser import parse
-from Queue import Queue
+from queue import Queue
 from threading import Thread,Event
 import redis
+import json
 import traceback
 from pymongo import uri_parser,MongoClient,ASCENDING,DESCENDING
-from self_config import *
-from aria2 import PyAria2
-from logmanage import *
+from .logmanage import *
 from ..extend import *
-
-
+from .. import *
 
 def GetConfig_pre(key):
     if key=='allow_site':
@@ -61,6 +59,14 @@ ReFreshData='client_id={client_id}&redirect_uri={redirect_uri}&client_secret={cl
 default_headers={'User-Agent':'ISV|PyOne|PyOne/4.0'}
 
 browser=requests.Session()
+
+
+
+def convert2str(string):
+    if type(string)==type(b's'):
+        return string.decode('utf-8')
+    else:
+        return string
 
 #获取参数
 def GetConfig(key):
@@ -95,7 +101,8 @@ def GetConfig(key):
             text=f.read()
         value=re.findall('od_users=([\w\W]*})',text)[0]
         value=json.loads(value)
-    return value
+        return value
+    return convert2str(value)
 
 
 ############功能函数
@@ -129,10 +136,6 @@ def set_config(key,value,user=GetConfig('default_pan')):
         f.write(new_text)
 
 
-
-#转字符串
-def convert2unicode(string):
-    return string.encode('utf-8')
 
 #获取
 def get_value(key,user=GetConfig('default_pan')):
@@ -240,7 +243,7 @@ def GetAppUrl(user):
         return 'https://graph.microsoft.com/'
     else:
         # return 'https://microsoftgraph.chinacloudapi.cn/'
-        return get_value('app_url',user)
+        return get_value('app_url',user).decode("utf-8")
 
 
 def GetLoginUrl(client_id,redirect_uri,od_type='nocn'):
@@ -374,7 +377,7 @@ def AddResource(data,user=GetConfig('default_pan')):
     #检查父文件夹是否在数据库，如果不在则获取添加
     grand_path=data.get('parentReference').get('path').replace('/drive/root:','') #空值或者/path
     try:
-        grand_path=urllib.unquote(grand_path.encode('utf-8')).decode('utf-8')
+        grand_path=urllib.unquote(grand_path.encode('utf-8'))
     except:
         grand_path=grand_path
     if grand_path=='':
@@ -398,7 +401,7 @@ def AddResource(data,user=GetConfig('default_pan')):
                     fdata=g.GetItemByPath(parent_path)
                     path=user+':/'+parent_path.replace('///','/')
                     path=path.replace('///','/').replace('//','/')
-                    path=urllib.unquote(path).decode('utf-8')
+                    path=urllib.unquote(path)
                     InfoLogger().print_r('[*AddResource] parent path:{} is not exists; Add data in mongo:{}'.format(parent_path,path))
                     item={}
                     item['type']='folder'
@@ -425,11 +428,11 @@ def AddResource(data,user=GetConfig('default_pan')):
     item['lastModtime']=date_to_char(parse(data.get('lastModifiedDateTime')))
     item['parent']=parent_id
     if grand_path=='':
-        path=user+':/'+convert2unicode(data['name'])
+        path=user+':/'+convert2str(data['name'])
     else:
-        path=user+':/'+grand_path+'/'+convert2unicode(data['name'])
+        path=user+':/'+grand_path+'/'+convert2str(data['name'])
     path=path.replace('//','/')
-    path=urllib.unquote(path).decode('utf-8')
+    path=urllib.unquote(path)
     grandid=len(path.split('/'))-2
     item['grandid']=grandid
     item['path']=path
@@ -525,8 +528,8 @@ class GetItemThread(Thread):
                                 item['type']='folder'
                                 item['user']=self.user
                                 item['order']=0
-                                item['name']=convert2unicode(value['name'])
-                                item['id']=convert2unicode(value['id'])
+                                item['name']=convert2str(value['name'])
+                                item['id']=convert2str(value['id'])
                                 item['size']=humanize.naturalsize(value['size'], gnu=True)
                                 item['size_order']=int(value['size'])
                                 item['lastModtime']=date_to_char(parse(value['lastModifiedDateTime']))
@@ -534,13 +537,13 @@ class GetItemThread(Thread):
                                 item['parent']=parent
                                 grand_path=value.get('parentReference').get('path').replace('/drive/root:','')
                                 if grand_path=='':
-                                    path=convert2unicode(value['name'])
+                                    path=convert2str(value['name'])
                                 else:
-                                    path=grand_path.replace(self.share_path,'',1)+'/'+convert2unicode(value['name'])
+                                    path=grand_path.replace(self.share_path,'',1)+'/'+convert2str(value['name'])
                                 if path.startswith('/') and path!='/':
                                     path=path[1:]
                                 if path=='':
-                                    path=convert2unicode(value['name'])
+                                    path=convert2str(value['name'])
                                 path=urllib.unquote('{}:/{}'.format(self.user,path))
                                 item['path']=path
                                 # self.insert_new(item)
@@ -549,8 +552,8 @@ class GetItemThread(Thread):
                                     continue
                                 else:
                                     parent_path=value.get('parentReference').get('path').replace('/drive/root:','')
-                                    path=convert2unicode(parent_path+'/'+value['name'])
-                                    # path=urllib.quote(convert2unicode(parent_path+'/'+value['name']))
+                                    path=convert2str(parent_path+'/'+value['name'])
+                                    # path=urllib.quote(convert2str(parent_path+'/'+value['name']))
                                     if od_type=='nocn' or od_type is None or od_type==False:
                                         url=app_url+'v1.0/me/drive/root:{}:/children?expand=thumbnails'.format(path)
                                     else:
@@ -561,8 +564,8 @@ class GetItemThread(Thread):
                             item['type']='folder'
                             item['user']=self.user
                             item['order']=0
-                            item['name']=convert2unicode(value['name'])
-                            item['id']=convert2unicode(value['id'])
+                            item['name']=convert2str(value['name'])
+                            item['id']=convert2str(value['id'])
                             item['size']=humanize.naturalsize(value['size'], gnu=True)
                             item['size_order']=int(value['size'])
                             item['lastModtime']=date_to_char(parse(value['lastModifiedDateTime']))
@@ -570,13 +573,13 @@ class GetItemThread(Thread):
                             item['parent']=parent
                             grand_path=value.get('parentReference').get('path').replace('/drive/root:','')
                             if grand_path=='':
-                                path=convert2unicode(value['name'])
+                                path=convert2str(value['name'])
                             else:
-                                path=grand_path.replace(self.share_path,'',1)+'/'+convert2unicode(value['name'])
+                                path=grand_path.replace(self.share_path,'',1)+'/'+convert2str(value['name'])
                             if path.startswith('/') and path!='/':
                                 path=path[1:]
                             if path=='':
-                                path=convert2unicode(value['name'])
+                                path=convert2str(value['name'])
                             path=urllib.unquote('{}:/{}'.format(self.user,path))
                             item['path']=path
                             # self.insert_new(item)
@@ -585,8 +588,8 @@ class GetItemThread(Thread):
                                 continue
                             else:
                                 parent_path=value.get('parentReference').get('path').replace('/drive/root:','')
-                                path=convert2unicode(parent_path+'/'+value['name'])
-                                # path=urllib.quote(convert2unicode(parent_path+'/'+value['name']))
+                                path=convert2str(parent_path+'/'+value['name'])
+                                # path=urllib.quote(convert2str(parent_path+'/'+value['name']))
                                 if od_type=='nocn' or od_type is None or od_type==False:
                                     url=app_url+'v1.0/me/drive/root:{}:/children?expand=thumbnails'.format(path)
                                 else:
@@ -599,18 +602,18 @@ class GetItemThread(Thread):
                             item['type']=GetExt(value['name'])
                             grand_path=value.get('parentReference').get('path').replace('/drive/root:','')
                             if grand_path=='':
-                                path=convert2unicode(value['name'])
+                                path=convert2str(value['name'])
                             else:
-                                path=grand_path.replace(self.share_path,'',1)+'/'+convert2unicode(value['name'])
+                                path=grand_path.replace(self.share_path,'',1)+'/'+convert2str(value['name'])
                             if path.startswith('/') and path!='/':
                                 path=path[1:]
                             if path=='':
-                                path=convert2unicode(value['name'])
+                                path=convert2str(value['name'])
                             path=urllib.unquote('{}:/{}'.format(self.user,path))
                             item['path']=path
                             item['user']=self.user
-                            item['name']=convert2unicode(value['name'])
-                            item['id']=convert2unicode(value['id'])
+                            item['name']=convert2str(value['name'])
+                            item['id']=convert2str(value['id'])
                             item['size']=humanize.naturalsize(value['size'], gnu=True)
                             item['size_order']=int(value['size'])
                             item['lastModtime']=date_to_char(parse(value['lastModifiedDateTime']))
@@ -644,7 +647,7 @@ class GetItemThread(Thread):
     def GetItemByPath(self,path):
         app_url=GetAppUrl(self.user)
         token=GetToken(user=self.user)
-        path=convert2unicode(path)
+        path=convert2str(path)
         od_type=get_value('od_type',self.user)
         if path=='' or path=='/':
             if od_type=='nocn' or od_type is None or od_type==False:

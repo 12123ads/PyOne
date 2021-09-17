@@ -1,5 +1,7 @@
-flask
+Werkzeug==0.14.1
+flask==1.0.1
 flask_sqlalchemy
+flask_script
 redis
 pymongo
 gunicorn==19.3.0

@@ -1,5 +1,5 @@
 #-*- coding=utf-8 -*-
-from base_view import *
+from .base_view import *
 
 
 ###########################################安装
@@ -65,7 +65,7 @@ def install():
             #授权
             headers={'Content-Type':'application/x-www-form-urlencoded'}
             headers.update(default_headers)
-            data=AuthData.format(client_id=client_id,redirect_uri=urllib.quote(GetConfig('redirect_uri')),client_secret=urllib.quote(client_secret),code=code)
+            data=AuthData.format(client_id=client_id,redirect_uri=urllib.parse.quote(GetConfig('redirect_uri')),client_secret=urllib.parse.quote(client_secret),code=code)
             if od_type=='cn':
                 data+='&resource=00000003-0000-0ff1-ce00-000000000000'
             url=GetOAuthUrl(od_type)

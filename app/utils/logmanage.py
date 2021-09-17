@@ -2,7 +2,7 @@
 import os
 import logging
 from logging import handlers
-from self_config import config_dir
+from .. import *
 
 class Logger(object):
     level_relations = {

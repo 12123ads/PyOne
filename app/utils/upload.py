@@ -1,6 +1,5 @@
 #-*- coding=utf-8 -*-
-from header import *
-import header
+from .header import *
 
 
 def _upload(filepath,remote_path,user=GetConfig('default_pan')): #remote_path like 'share/share.mp4'
@@ -27,7 +26,7 @@ def _upload(filepath,remote_path,user=GetConfig('default_pan')): #remote_path li
                     yield {'status':'upload fail!'}
                     break
                 elif r.status_code==201 or r.status_code==200:
-                    speed=CalcSpeed(header._filesize(filepath),timeCalc.PassNow())['kb']
+                    speed=CalcSpeed(_filesize(filepath),timeCalc.PassNow())['kb']
                     InfoLogger().print_r('upload {} success! speed:{}'.format(filepath,speed))
                     AddResource(data,user)
                     yield {'status':'upload success!','speed':speed}
@@ -59,7 +58,7 @@ def _upload_part(uploadUrl, filepath,filesize, offset, length,trytime=1,request_
     length=length if offset+length<filesize else filesize-offset
     endpos=offset+length-1 if offset+length<filesize else filesize-1
     # InfoLogger().print_r('upload file {} {}%'.format(filepath,round(float(endpos)/filesize*100,1)))
-    filebin=header._file_content(filepath,offset,length)
+    filebin=_file_content(filepath,offset,length)
     headers={}
     # headers['Authorization']='bearer {}'.format(token)
     headers['Content-Type']='application/octet-stream'
@@ -132,7 +131,7 @@ def UploadSession(uploadUrl,filesize, filepath,user):
     length=10 * 1024 * 1024
     offset=0
     trytime=1
-    # filesize=header._filesize(filepath)
+    # filesize=_filesize(filepath)
     request_session=requests.Session()
     while 1:
         result=_upload_part(uploadUrl, filepath,filesize, offset, length,trytime=trytime,request_session=request_session)
@@ -176,7 +175,7 @@ def Upload_for_server(filepath,remote_path=None,user=GetConfig('default_pan')):
         remote_path='/'+remote_path
     filepath=convert2unicode(filepath)
     remote_path=convert2unicode(remote_path.replace('//','/'))
-    filesize=header._filesize(filepath)
+    filesize=_filesize(filepath)
     InfoLogger().print_r('local file path:{}, remote file path:{}'.format(filepath,remote_path))
     if filesize<4 * 1024 * 1024:
         for msg in _upload(filepath,remote_path,user):
@@ -206,7 +205,7 @@ def Upload(filepath,remote_path=None,user=GetConfig('default_pan')):
     if not remote_path.startswith('/'):
         remote_path='/'+remote_path
     remote_path=remote_path.replace('//','/')
-    filesize=header._filesize(filepath)
+    filesize=_filesize(filepath)
     InfoLogger().print_r('local file path:{}, remote file path:{}'.format(filepath,remote_path))
     if filesize<4 * 1024 * 1024:
         for msg in _upload(filepath,remote_path,user):
@@ -239,7 +238,7 @@ def ContinueUpload(filepath,uploadUrl,user):
     else:
         length=10 * 1024 * 1024
         trytime=1
-        filesize=header._filesize(filepath)
+        filesize=_filesize(filepath)
         while 1:
             result=_upload_part(uploadUrl, filepath,filesize, offset, length,trytime=trytime)
             code=result['code']
@@ -310,7 +309,7 @@ def UploadDir(local_dir,remote_dir,user,threads=int(GetConfig('thread_num'))):
     tasks=[]
     for remote_path,file in check_file_list:
         queue.put((file,remote_path))
-    print "start upload files 5s later"
+    print("start upload files 5s later")
     time.sleep(5)
     for i in range(min(threads,queue.qsize())):
         t=MultiUpload(queue,user)
