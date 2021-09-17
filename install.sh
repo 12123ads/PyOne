@@ -189,7 +189,7 @@ install_pip(){
 }
 
 install_package(){
-    pip3 install -r requirements.txt
+    pip install -r requirements.txt
 }
 
 install_pyenv(){
