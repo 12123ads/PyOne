@@ -189,7 +189,7 @@ install_pip(){
 }
 
 install_package(){
-    pip install -r requirements.txt
+    ~/.pyenv/versions/3.7.4/bin/pip install -r requirements.txt
 }
 
 install_pyenv(){
@@ -225,9 +225,12 @@ install_pyenv(){
             apt-get install -y python3-eventlet
         fi
         curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
-        echo "export PATH=\"\$HOME/.pyenv/bin:\$PATH\"
-eval \"\$(pyenv init -)\"
-eval \"\$(pyenv virtualenv-init -)\"" >> ~/.bashrc
+        echo "export PYENV_ROOT=\"\$HOME/.pyenv\"
+export PYENV_APP=manage.py
+export PATH=\"\$PYENV_ROOT/shims:\$HOME/.pyenv/bin:\$PATH\"
+eval \"\$(pyenv init --path)\"
+eval \"\$(pyenv virtualenv-init -)\"
+" >> ~/.bashrc
 
         source ~/.bashrc
 
@@ -302,7 +305,7 @@ WantedBy=multi-user.target
 " > '/etc/systemd/system/pyone.service'
 
         EXEC="$(command -v gunicorn)"
-        sed -i "s#gunicorn#${EXEC}#g" /etc/systemd/system/pyone.service
+        # sed -i "s#gunicorn#${EXEC}#g" /etc/systemd/system/pyone.service
         systemctl start aria2 pyone
         systemctl enable aria2 pyone
 }
@@ -325,7 +328,7 @@ info(){
     echo -e "${Blue}7. 重启Aria2: systemctl restart aria2${Font}"
     echo -e "———————————————————————————————————————"
     echo -e "${Blue}PyOne交流群：864996565${Font}"
-    echo -e "${Blue}PyOne交流群TG：https://t.me/joinchat/JQOOug6MY11gy_MiXTmqIA${Font}"
+    # echo -e "${Blue}PyOne交流群TG：https://t.me/joinchat/JQOOug6MY11gy_MiXTmqIA${Font}"
 }
 
 #start menu

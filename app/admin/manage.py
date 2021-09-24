@@ -8,7 +8,7 @@ from .base_view import *
 def manage():
     if request.method=='POST':
         pass
-    path=urllib.unquote(request.args.get('path','{}:/'.format(GetConfig('default_pan'))))
+    path=urllib.parse.unquote(request.args.get('path','{}:/'.format(GetConfig('default_pan'))))
     if path=='':
         path='{}:/'.format(GetConfig('default_pan'))
     user,n_path=path.split(':')
@@ -118,12 +118,12 @@ def server_to_one():
     if remote_folder!='/':
         remote_folder=remote_folder+'/'
     local_dir=os.path.join(config_dir,'upload')
-    filepath=urllib.unquote(os.path.join(local_dir,filename))
+    filepath=urllib.parse.unquote(os.path.join(local_dir,filename))
     _upload_session=Upload_for_server(filepath,remote_folder,user)
     def read_status():
         while 1:
             try:
-                msg=_upload_session.next()['status']
+                msg=_upload_session.__next__()['status']
                 yield "data:" + msg + "\n\n"
             except Exception as e:
                 exstr = traceback.format_exc()
@@ -149,7 +149,7 @@ def setFile(filename=None):
         content=request.form.get('content').encode('utf-8')
         info=CreateFile(filename=filename,path=n_path,content=content,user=user)
         return jsonify(info)
-    path=urllib.unquote(request.args.get('path'))
+    path=urllib.parse.unquote(request.args.get('path'))
     if path.split(':')[-1]=='':
         path=path.split(':')[0]+':/'
     user,n_path=path.split(':')

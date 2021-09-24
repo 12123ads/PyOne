@@ -96,7 +96,7 @@ def download_and_upload(url,remote_dir,user,gid=None,outerid=None):
                 new_item['selected']='true'
                 new_item['selectable']='true'
                 new_item['user']=user
-                new_item['speed']='{} KB/s'.format(round(int(aa['downloadSpeed'])/1024,1))
+                new_item['speed']='{}'.format(round(int(aa['downloadSpeed'])/1024,1))
                 new_item['remote_dir']=remote_dir
                 new_item['uploadUrl']=''
                 new_item['size']=file['length']
@@ -127,14 +127,14 @@ def download_and_upload(url,remote_dir,user,gid=None,outerid=None):
                 continue
             name=file['path'].replace(down_path+'/','').replace(down_path,'').replace(down_path[:-1],'')
             down_percent=round(float(file['completedLength'])/(float(file['length'])+0.1)*100,0)
-            down_speed='{} KB/s'.format(round(int(a['downloadSpeed'])/1024,1))
+            down_speed='{}'.format(round(int(a['downloadSpeed'])/1024,1))
             new_value={'down_status':u'{}%'.format(down_percent)}
             new_value['speed']=down_speed
             new_value['name']=name
             new_value['size']=file['length']
             # new_value['size']=humanize.naturalsize(file['length'], gnu=True)
             new_value['localpath']=file['path']
-            InfoLogger().print_r('{} download status:{};speed:{}'.format(name,down_percent,down_speed))
+            InfoLogger().print_r('{} download status:{};speed:{}KB/s'.format(name,down_percent,down_speed))
             if a['status']=='complete' or (file['completedLength']==file['length'] and int(file['length'])!=0):
                 new_value['up_status']=u'准备上传'
                 new_value['status']=0
@@ -205,7 +205,7 @@ def upload_status(gid,idx,remote_dir,user,outerid=None):
     while 1:
         try:
             new_value={}
-            data=_upload_session.next()
+            data=_upload_session.__next__()
             msg=data['status']
             # InfoLogger().print_r('{} upload status:{}'.format(item['localpath'],msg))
             """
@@ -307,7 +307,7 @@ def get_tasks(status):
             except Exception as e:
                 complete+=0
             if 'partition upload success' in file['up_status'] or (file['down_status']!='100%' and '%' in file['down_status']):
-                tmp_speed=max(file['speed'],tmp_speed)
+                tmp_speed=max(float(file['speed']),tmp_speed)
             file_info['idx']=file['idx']
             file_info['speed']=file['speed']
             file_info['name']=file['name'].replace(title+'/','')

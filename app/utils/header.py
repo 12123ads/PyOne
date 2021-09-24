@@ -68,6 +68,8 @@ def convert2str(string):
     else:
         return string
 
+def convert2unicode(string):
+    return convert2str(string)
 #获取参数
 def GetConfig(key):
     try:
@@ -715,8 +717,8 @@ class TimeCalculator:
 def CalcSpeed(length,timecost):
     raw_sp=length/timecost
     info={
-        'kb':str(round(raw_sp/1024,1))+'KB/s',
-        'mb':str(round(raw_sp/1024/1024,1))+'MB/s',
+        'kb':str(round(raw_sp/1024,1)),
+        'mb':str(round(raw_sp/1024/1024,1)),
     }
     return info
 

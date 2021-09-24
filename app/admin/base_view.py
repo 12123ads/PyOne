@@ -76,7 +76,7 @@ def stream():
         tc=TimeCalculator()
         _pid=popen.pid
         while not popen.poll():
-            msg=popen.stdout.readline()
+            msg=popen.stdout.readline().decode('utf-8')
             if msg=='end':
                 yield "data:end\n\n"
                 break

@@ -1,5 +1,6 @@
 #-*- coding=utf-8 -*-
 from .header import *
+from .header import _filesize
 
 
 def _upload(filepath,remote_path,user=GetConfig('default_pan')): #remote_path like 'share/share.mp4'

@@ -5,9 +5,9 @@ from .base_view import *
 @admin.route('/upload',methods=["POST","GET"])
 def upload():
     if request.method=='POST':
-        user=request.form.get('user').encode('utf-8')
-        local=request.form.get('local').encode('utf-8')
-        remote=request.form.get('remote').encode('utf-8')
+        user=request.form.get('user')
+        local=request.form.get('local')
+        remote=request.form.get('remote')
         if not os.path.exists(local):
             flash('本地目录/文件不存在')
             return redirect(url_for('admin.upload'))
@@ -23,12 +23,13 @@ def upload():
             dir_,fname=os.path.dirname(file),os.path.basename(file)
             remote_path=remote+'/'+dir_.replace(local,'')+'/'+fname
             remote_path=remote_path.replace('//','/')
+            id=str(int(round(time.time())))+file
             info['user']=user
             info['localpath']=file
             info['remote']=remote_path.replace('//','/')
             info['status']=''
             info['speed']=''
-            info['id']=base64.b64encode(str(int(round(time.time())))+file)
+            info['id']=base64.b64encode(id.encode('utf-8'))
             info['add_time']=int(round(time.time()))
             mon_db.upload_queue.insert_one(info)
         cmd='python {}/function.py StartUploadQueue'.format(config_dir)

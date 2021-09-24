@@ -76,7 +76,7 @@ class MultiUploadQueue(Thread):
             while 1:
                 try:
                     new_value={}
-                    data=_upload_session.next()
+                    data=_upload_session.__next__()
                     msg=data['status']
                     InfoLogger().print_r('{} upload status:{}'.format(localpath,msg))
                     """
