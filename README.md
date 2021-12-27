@@ -3,7 +3,7 @@
 
 ### 2021.09.17更新: 适配Python3
 
-### Wiki地址：[https://abbeyokgo.github.io/](https://abbeyokgo.github.io/)
+### Wiki地址：[https://www.showdoc.com.cn/pyone](https://www.showdoc.com.cn/pyone)
 
 ### QQ交流群：[https://jq.qq.com/?_wv=1027&k=5ypfek0](https://jq.qq.com/?_wv=1027&k=5ypfek0)
 
