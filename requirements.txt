@@ -12,7 +12,7 @@ markdown
 shelljob
 eventlet
 flask_caching
-flask_limiter
+flask_limiter==1.5
 Flask-And-Redis
 flask_script
 pycrypto
