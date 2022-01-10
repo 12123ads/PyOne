@@ -1,7 +1,6 @@
 #-*- coding=utf-8 -*-
 from flask import render_template,redirect,abort,make_response,jsonify,request,url_for,Response,session,flash
 from flask_sqlalchemy import Pagination
-from self_config import *
 from ..utils import *
 from ..extend import *
 from .. import *
@@ -77,7 +76,7 @@ def stream():
         tc=TimeCalculator()
         _pid=popen.pid
         while not popen.poll():
-            msg=popen.stdout.readline()
+            msg=popen.stdout.readline().decode('utf-8')
             if msg=='end':
                 yield "data:end\n\n"
                 break

@@ -1,5 +1,5 @@
 #-*- coding=utf-8 -*-
-from base_view import *
+from .base_view import *
 
 
 

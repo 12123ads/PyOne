@@ -173,7 +173,7 @@ install_pip(){
         EXEC="$(command -v pip)"
         if [[ -z ${EXEC} ]]; then
         wget https://bootstrap.pypa.io/get-pip.py
-        python get-pip.py
+        python3 get-pip.py
         fi
     else
         apt -y install python-pip
@@ -189,10 +189,69 @@ install_pip(){
 }
 
 install_package(){
-    pip2 install -r requirements.txt
+    ~/.pyenv/versions/3.7.4/bin/pip install -r requirements.txt
 }
 
+install_pyenv(){
+    s=`ls -a $HOME/ | grep ".pyenv" | wc -l`
+    if [[ $s = 0 ]]; then
+        echo -e "${Blue}正在安装pyenv！${Font}"
+        if [[ "${release}" = "centos" ]]; then
+            yum install git
+            yum install curl -y
+            yum -y install zlib\*
+            yum install gcc -y
+            yum install make -y
+            yum install openssl -y
+            yum install openssl-devel -y
+            yum install sqlite-devel -y
+            yum install libffi-devel -y
+            yum install readline readline-devel -y
+        else
+            apt-get install -y git
+            apt-get install -y curl
+            apt-get install -y gcc
+            apt-get install -y make
+            apt-get install -y zlib1g
+            apt-get install -y zlib1g-dev
+            apt-get install -y zlibc
+            apt-get install -y libffi-devel
+            apt-get install -y libffi-dev
+            apt-get install -y libssl-dev
+            apt-get install -y sqlite3
+            apt-get install -y libsqlite3-dev
+            apt-get install -y libreadline6
+            apt-get install -y libreadline6–dev
+            apt-get install -y python3-eventlet
+        fi
+        curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+        echo "export PYENV_ROOT=\"\$HOME/.pyenv\"
+export PYENV_APP=manage.py
+export PATH=\"\$PYENV_ROOT/shims:\$HOME/.pyenv/bin:\$PATH\"
+eval \"\$(pyenv init --path)\"
+eval \"\$(pyenv virtualenv-init -)\"
+" >> ~/.bashrc
 
+        source ~/.bashrc
+
+        s=`ls -a $HOME/ | grep ".pyenv" | wc -l`
+        if [[ $s = 0 ]]; then
+            echo -e "${Red}安装pyenv出错！"
+            exit 1
+        else
+            echo "pyenv安装完成"
+        fi
+    else
+        echo "pyenv已安装"
+    fi
+
+}
+
+install_py374(){
+    $HOME/.pyenv/bin/pyenv install -v 3.7.4
+    $HOME/.pyenv/bin/pyenv rehash
+    $HOME/.pyenv/bin/pyenv local 3.7.4
+}
 
 #open firewall
 firewall(){
@@ -236,7 +295,7 @@ Wants=network.target
 Type=simple
 PIDFile=/var/run/pyone.pid
 WorkingDirectory=${cur_path}
-ExecStart=gunicorn -keventlet -b 0.0.0.0:34567 run:app
+ExecStart=$HOME/.pyenv/versions/3.7.4/bin/gunicorn -b 0.0.0.0:34567 run:app
 RestartPreventExitStatus=23
 Restart=always
 User=root
@@ -246,7 +305,7 @@ WantedBy=multi-user.target
 " > '/etc/systemd/system/pyone.service'
 
         EXEC="$(command -v gunicorn)"
-        sed -i "s#gunicorn#${EXEC}#g" /etc/systemd/system/pyone.service
+        # sed -i "s#gunicorn#${EXEC}#g" /etc/systemd/system/pyone.service
         systemctl start aria2 pyone
         systemctl enable aria2 pyone
 }
@@ -263,13 +322,13 @@ info(){
     echo -e "${Blue}1. 暂停PyOne: systemctl stop pyone${Font}"
     echo -e "${Blue}2. 启动PyOne: systemctl start pyone${Font}"
     echo -e "${Blue}3. 重启PyOne: systemctl restart pyone${Font}"
-    echo -e "${Blue}4. 手动运行PyOne: systemctl stop pyone && gunicorn -keventlet -b 0:34567 run:app${Font}"
+    echo -e "${Blue}4. 手动运行PyOne: systemctl stop pyone && $HOME/.pyenv/versions/3.7.4/bin/gunicorn -b 0:34567 run:app${Font}"
     echo -e "${Blue}5. 暂停Aria2: systemctl stop aria2${Font}"
     echo -e "${Blue}6. 启动Aria2: systemctl start aria2${Font}"
     echo -e "${Blue}7. 重启Aria2: systemctl restart aria2${Font}"
     echo -e "———————————————————————————————————————"
     echo -e "${Blue}PyOne交流群：864996565${Font}"
-    echo -e "${Blue}PyOne交流群TG：https://t.me/joinchat/JQOOug6MY11gy_MiXTmqIA${Font}"
+    # echo -e "${Blue}PyOne交流群TG：https://t.me/joinchat/JQOOug6MY11gy_MiXTmqIA${Font}"
 }
 
 #start menu
@@ -288,7 +347,11 @@ main(){
     enter
     install_depend
     install_aria2
-    install_pip
+    # install_pip
+    # install_package
+    install_pyenv
+    install_py374
+    eval `source ~/.bashrc`
     install_package
     firewall
     start

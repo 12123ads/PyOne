@@ -2,7 +2,7 @@
 from flask import url_for,request
 import hashlib
 import markdown
-from header import *
+from .header import *
 
 ################################################################################
 ###################################功能函数#####################################
@@ -15,7 +15,7 @@ def md5(string):
 def GetTotal(path='{}:/'.format(GetConfig('default_pan'))):
     key='file_count:{}'.format(path)
     if redis_client.exists(key):
-        return int(redis_client.get(key))
+        return int(redis_client.get(key).decode('utf-8'))
     else:
         user,n_path=path.split(':')
         if n_path=='/':
@@ -168,7 +168,7 @@ def _getdownloadurl(id,user):
     app_url=GetAppUrl(user)
     od_type=get_value('od_type',user)
     token=GetToken(user=user)
-    filename=GetName(id)
+    filename=GetName(id).decode('utf-8')
     ext=filename.split('.')[-1].lower()
     headers={'Authorization':'bearer {}'.format(token),'Content-type':'application/json'}
     headers.update(default_headers)
@@ -197,7 +197,7 @@ def _getdownloadurl(id,user):
 def GetDownloadUrl(id,user):
     key_='downloadurl:{}'.format(id)
     if redis_client.exists(key_):
-        downloadUrl,play_url,ftime=redis_client.get(key_).split('####')
+        downloadUrl,play_url,ftime=redis_client.get(key_).decode('utf-8').split('####')
         if time.time()-int(ftime)>=600:
             # InfoLogger().print_r('{} downloadUrl expired!'.format(id))
             downloadUrl,play_url=_getdownloadurl(id,user)
@@ -301,7 +301,7 @@ def file_ico(item):
 def _remote_content(fileid,user):
     kc='{}:content'.format(fileid)
     if redis_client.exists(kc):
-        content=unicode(redis_client.get(kc), errors='ignore')
+        content=unicode(redis_client.get(kc).decode('utf-8'), errors='ignore')
         return content
     else:
         downloadUrl,play_url=GetDownloadUrl(fileid,user)
@@ -326,7 +326,7 @@ def has_item(path,name):
     key='has_item$#$#$#$#{}$#$#$#$#{}'.format(path,name)
     # if False:
     if redis_client.exists(key):
-        values=redis_client.get(key)
+        values=redis_client.get(key).decode('utf-8')
         item,fid,cur=values.split('########')
         if item=='False':
             item=False

@@ -1,5 +1,5 @@
 #-*- coding=utf-8 -*-
-from header import *
+from .header import *
 from Crypto import Random
 from Crypto.Cipher import AES
 import hashlib
@@ -13,8 +13,8 @@ class AesCls(object):
         self.key=key
 
     def pad(self,data):
-        length = 16 - (len(data) % 16)
-        return data + (chr(length)*length).encode()
+        length = 16 - (len(data.encode()) % 16)
+        return data.encode() + (chr(length)*length).encode()
 
     def unpad(self,data):
         return data[:-(data[-1] if type(data[-1]) == int else ord(data[-1]))]
@@ -51,7 +51,7 @@ class AesCls(object):
 
 
 def replace_token(token):
-    return token.replace('+','plus').replace('/','xiegang').replace('=','equal')
+    return token.decode('utf-8').replace('+','plus').replace('/','xiegang').replace('=','equal')
 
 def reverse_token(token):
     return token.replace('plus','+').replace('xiegang','/').replace('equal','=')
@@ -60,7 +60,7 @@ def VerifyToken(token,filepath):
     token=reverse_token(token)
     path=filepath.split(':')[-1]
     ae=AesCls(GetConfig("password"))
-    msg=ae.decrypt(token)
+    msg=ae.decrypt(token).decode('utf-8')
     r_filepath,timeout=msg.split('#$#')
     if r_filepath==path and int(timeout)>time.time():
         return True

@@ -1,5 +1,5 @@
 #-*- coding=utf-8 -*-
-from header import *
+from .header import *
 
 def Dir(path=u'{}:/'.format(GetConfig('default_pan'))):
     user,n_path=path.split(':')
@@ -33,7 +33,7 @@ def Dir(path=u'{}:/'.format(GetConfig('default_pan'))):
                 mon_db.items.delete_many({'parent':parent_id})
             grandid=idx+1
             parent=parent_id
-        n_path=urllib.quote(n_path.encode('utf-8'))
+        n_path=urllib.quote(n_path.encode('utf-8')).decode("utf-8")
         if od_type=='nocn' or od_type is None or od_type==False:
             BaseUrl=app_url+u'v1.0/me/drive/root:{}:/children?expand=thumbnails'.format(n_path)
         else:

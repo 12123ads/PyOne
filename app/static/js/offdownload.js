@@ -197,7 +197,7 @@ function tellActive(admin_prefix) {
                     //header
                     html+='   <div class="mdui-panel-item-header">';
                     html+='        <div class="mdui-col-xs-6 mdui-text-truncate">'+t['title']+'</div>';
-                    html+='        <div class="mdui-col-xs-4">'+t['size']+' / '+t['down_percent']+' / '+t['speed']+'</div>';
+                    html+='        <div class="mdui-col-xs-4">'+t['size']+' / '+t['down_percent']+' / '+t['speed']+'KB/s</div>';
                          //active -- >pause/unpause/remove
                         td='       <div class="mdui-col-xs-2">&nbsp;&nbsp;&nbsp;';
                         if(t['down_status']=='暂停下载'){
@@ -289,7 +289,7 @@ function tellFail(admin_prefix) {
                     //header
                     html+='   <div class="mdui-panel-item-header">';
                     html+='        <div class="mdui-col-xs-6 mdui-text-truncate">'+t['title']+'</div>';
-                    html+='        <div class="mdui-col-xs-4">'+t['size']+' / '+t['down_percent']+' / '+t['speed']+'</div>';
+                    html+='        <div class="mdui-col-xs-4">'+t['size']+' / '+t['down_percent']+' / '+t['speed']+'KB/s</div>';
                          //active -- >pause/unpause/remove
                         td='       <div class="mdui-col-xs-2">&nbsp;&nbsp;&nbsp;';
                         if(t['down_status']=='暂停下载'){
@@ -381,7 +381,7 @@ function tellSuccess(admin_prefix) {
                     //header
                     html+='   <div class="mdui-panel-item-header">';
                     html+='        <div class="mdui-col-xs-6 mdui-text-truncate">'+t['title']+'</div>';
-                    html+='        <div class="mdui-col-xs-4">'+t['size']+' / '+t['down_percent']+' / '+t['speed']+'</div>';
+                    html+='        <div class="mdui-col-xs-4">'+t['size']+' / '+t['down_percent']+' / '+t['speed']+'KB/s</div>';
                          //active -- >pause/unpause/remove
                         td='       <div class="mdui-col-xs-2">&nbsp;&nbsp;&nbsp;';
                         // if(t['selectable']=='true'){

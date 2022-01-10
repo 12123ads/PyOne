@@ -1,9 +1,9 @@
 #-*- coding=utf-8 -*-
 from flask import Flask
 from werkzeug.contrib.fixers import ProxyFix
-from config import config
+from config import *
 from .extend import *
-from utils.header import GetConfig
+from .utils.header import GetConfig
 
 
 

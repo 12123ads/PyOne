@@ -1,6 +1,6 @@
 #-*- coding=utf-8 -*-
-from header import *
-from upload import *
+from .header import *
+from .upload import *
 
 def CutText(msg,indent=15):
     if len(msg)>indent*2:
@@ -76,7 +76,7 @@ class MultiUploadQueue(Thread):
             while 1:
                 try:
                     new_value={}
-                    data=_upload_session.next()
+                    data=_upload_session.__next__()
                     msg=data['status']
                     InfoLogger().print_r('{} upload status:{}'.format(localpath,msg))
                     """

@@ -8,6 +8,8 @@ from . import front
 ################################################################################
 ###################################前台函数#####################################
 ################################################################################
+
+
 @front.before_request
 def before_request():
     bad_ua=['Googlebot-Image','FeedDemon ','BOT/0.1 (BOT for JCE)','CrawlDaddy ','Java','Feedly','UniversalFeedParser','ApacheBench','Swiftbot','ZmEu','Indy Library','oBot','jaunty','YandexBot','AhrefsBot','MJ12bot','WinHttp','EasouSpider','HttpClient','Microsoft URL Control','YYSpider','jaunty','Python-urllib','lightDeckReports Bot','PHP','vxiaotou-spider','spider']
@@ -51,7 +53,7 @@ def index(path=None):
     balance=eval(GetConfig('balance'))
     if path is None:
         path='{}:/'.format(GetConfig('default_pan'))
-    path=urllib.unquote(path).split('?')[0]
+    path=urllib.parse.unquote(path).split('?')[0]
     if not os.path.exists(os.path.join(config_dir,'.install')):
         resp=redirect(url_for('admin.install',step=0,user=GetConfig('default_pan')))
         return resp
@@ -139,11 +141,11 @@ def index(path=None):
 def show(fileid,user,action='download',token=None):
     if token is None:
         token=request.args.get('token')
-    path=GetPath(fileid)
-    name=GetName(fileid)
+    path=convert2str(GetPath(fileid))
+    name=convert2str(GetName(fileid))
     ext=name.split('.')[-1].lower()
-    url=request.url.replace(':80','').replace(':443','').encode('utf-8').split('?')[0]
-    url='/'.join(url.split('/')[:3])+'/'+urllib.quote('/'.join(url.split('/')[3:]))
+    url=request.url.replace(':80','').replace(':443','').split('?')[0]
+    url='/'.join(url.split('/')[:3])+'/'+urllib.parse.quote('/'.join(url.split('/')[3:]))
     if GetConfig("verify_url")=="True":
         url=url+'?token='+GenerateToken(path)
         if action not in ['share','iframe']:
@@ -163,7 +165,7 @@ def show(fileid,user,action='download',token=None):
                 resp=MakeResponse(render_template('show/pdf.html'.format(GetConfig('theme')),url=url,path=path,cur_user=user,name=name))
         elif ext in GetConfig('show_doc').split(','):
             downloadUrl,play_url=GetDownloadUrl(fileid,user)
-            url = 'https://view.officeapps.live.com/op/view.aspx?src='+urllib.quote(downloadUrl)
+            url = 'https://view.officeapps.live.com/op/view.aspx?src='+urllib.parse.quote(downloadUrl)
             resp=MakeResponse(redirect(url))
         elif ext in GetConfig('show_image').split(','):
             if action=='share':
